@@ -1,0 +1,6 @@
+data:
+  class_path: dataloaders.RandomSample.RandomSampleDataModule
+  init_args:
+    name: test
+    batch_size: [4, 2]
+    num_workers: 4
