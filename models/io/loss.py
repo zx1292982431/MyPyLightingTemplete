@@ -101,7 +101,8 @@ class Loss(nn.Module):
         elif self.loss_func == cc_mse:
             out, XrMM, stft = kwargs['out'], kwargs['XrMM'], kwargs['stft']
             Yr, _ = stft.stft(yr)
-            Yr = Yr / XrMM
+            if XrMM is not None:
+                Yr = Yr / XrMM
             preds, target = torch.view_as_real(out), torch.view_as_real(Yr)
         else:
             preds, target = yr_hat, yr
