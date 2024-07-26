@@ -345,6 +345,9 @@ class TrainCLI(BaseCLI):
 
     def add_arguments_to_parser(self, parser: LightningArgumentParser) -> None:
         # # EarlyStopping
+        parser.set_defaults({"trainer.strategy": "ddp_find_unused_parameters_false"})
+        parser.set_defaults({"trainer.accelerator": "gpu"})
+        
         parser.add_lightning_class_args(EarlyStopping, "early_stopping")
         early_stopping_defaults = {
             "early_stopping.enable": False,
