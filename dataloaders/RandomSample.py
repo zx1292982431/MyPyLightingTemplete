@@ -4,8 +4,10 @@ from lightning.pytorch.utilities.types import TRAIN_DATALOADERS
 import torch
 from torch.utils.data import Dataset,DataLoader
 from pytorch_lightning import LightningDataModule
-from typing import List
+from typing import *
 from dataloaders.utils.collate_func import default_collate_func
+from dataloaders.utils.my_distributed_sampler import MyDistributedSampler
+import random
 
 class RandomSampleDataset(Dataset):
     def __init__(self):
@@ -28,7 +30,8 @@ class RandomSampleDataModule(LightningDataModule):
             batch_size: List[int] = [1, 1],
             num_workers: int = 0, # num workers of dataloader
             pin_memory: bool = True,
-            persistent_workers:bool = True
+            persistent_workers:bool = True,
+            seeds: Tuple[Optional[int], int, int] = [None, 2, 3],
     ):
         super().__init__()
         self.name = name
@@ -40,6 +43,9 @@ class RandomSampleDataModule(LightningDataModule):
         self.batch_size_test = 1
         if len(batch_size) > 2:
             self.batch_size_test = batch_size[2]
+        self.seeds = []
+        for seed in seeds:
+            self.seeds.append(seed if seed is not None else random.randint(0, 1000000))
     
     def setup(self, stage=None):
         self.trainset = RandomSampleDataset()
@@ -53,7 +59,8 @@ class RandomSampleDataModule(LightningDataModule):
                 num_workers=self.num_workers,
                 pin_memory=self.pin_memory,
                 persistent_workers=self.persistent_workers,
-                collate_fn=default_collate_func
+                collate_fn=default_collate_func,
+                sampler=MyDistributedSampler(self.trainset,seed=self.seeds[0],shuffle=True)
             )
     
     def val_dataloader(self) -> DataLoader:
@@ -63,7 +70,8 @@ class RandomSampleDataModule(LightningDataModule):
                 num_workers=self.num_workers,
                 pin_memory=self.pin_memory,
                 persistent_workers=self.persistent_workers,
-                collate_fn=default_collate_func
+                collate_fn=default_collate_func,
+                sampler=MyDistributedSampler(self.trainset,seed=self.seeds[1],shuffle=False)
             )
     
     def test_dataloader(self) -> DataLoader:
@@ -73,7 +81,8 @@ class RandomSampleDataModule(LightningDataModule):
                 num_workers=self.num_workers,
                 pin_memory=self.pin_memory,
                 persistent_workers=self.persistent_workers,
-                collate_fn=default_collate_func
+                collate_fn=default_collate_func,
+                sampler=MyDistributedSampler(self.testset,seed=self.seeds[2],shuffle=False)
             )
     
 if __name__ == '__main__':
