@@ -1,18 +1,24 @@
+import sys
+sys.path.append('/home/lizixuan/workspace/projects/MylightingTemplete')
 from lightning.pytorch.utilities.types import TRAIN_DATALOADERS
 import torch
 from torch.utils.data import Dataset,DataLoader
 from pytorch_lightning import LightningDataModule
 from typing import List
+from dataloaders.utils.collate_func import default_collate_func
 
 class RandomSampleDataset(Dataset):
     def __init__(self):
         self.name = 'Randomsample Dataset'
     def __len__(self):
-        return 1000
+        return 200
     def __getitem__(self,index):
         x = torch.rand(1,16000)
         y = torch.rand(1,1,16000)
-        paras = {'samplerate':16000}
+        paras = {
+            'samplerate':16000,
+            'index':index
+        }
         return x,y,paras
 
 class RandomSampleDataModule(LightningDataModule):
@@ -46,20 +52,31 @@ class RandomSampleDataModule(LightningDataModule):
                 batch_size=self.batch_size,
                 num_workers=self.num_workers,
                 pin_memory=self.pin_memory,
-                persistent_workers=self.persistent_workers
+                persistent_workers=self.persistent_workers,
+                collate_fn=default_collate_func
             )
     
     def val_dataloader(self) -> DataLoader:
         return DataLoader(
                 self.evalset,
-                batch_size=self.batch_size,
+                batch_size=self.batch_size_val,
                 num_workers=self.num_workers,
                 pin_memory=self.pin_memory,
-                persistent_workers=self.persistent_workers
+                persistent_workers=self.persistent_workers,
+                collate_fn=default_collate_func
+            )
+    
+    def test_dataloader(self) -> DataLoader:
+        return DataLoader(
+                self.testset,
+                batch_size=self.batch_size_test,
+                num_workers=self.num_workers,
+                pin_memory=self.pin_memory,
+                persistent_workers=self.persistent_workers,
+                collate_fn=default_collate_func
             )
     
 if __name__ == '__main__':
-
     data_module = RandomSampleDataModule(
         name='test' ,
         num_workers=4

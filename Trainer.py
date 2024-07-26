@@ -182,7 +182,7 @@ class TrainModule(pl.LightningModule):
             self.log('val/neg_si_sdr', -si_sdr_val, sync_dist=True, batch_size=ys.shape[0])
 
         # other heavy metrics: pesq
-        sample_rate = paras['samplerate'][0]
+        sample_rate = paras[0]['samplerate']
         yrs = [[
             ['nb_pesq'] if sample_rate == 8000 else ['nb_pesq', 'wb_pesq'],
             yr_hat.detach().cpu(),
@@ -221,7 +221,7 @@ class TrainModule(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x, ys, paras = batch
         yr = ys[:, :, self.ref_channel, :]
-        sample_rate = 16000 if 'sample_rate' not in paras[0] else paras[0]['sample_rate']
+        sample_rate = 16000 if 'sample_rate' not in paras else paras[0]['sample_rate']
 
         if self.trainer.precision == '16-mixed' or self.trainer.precision == 'bf16-mixed':
             # use float 32 precision for validation and test

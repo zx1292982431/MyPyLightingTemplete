@@ -89,6 +89,8 @@ model:
   - WB_PESQ
   - WB_PESQ
   - eSTOI
+  - DNSMOS
+  - STOI
   mchunk: null
   val_metric: loss
   write_examples: 200

@@ -17,8 +17,8 @@ ALL_AUDIO_METRICS = ['SDR', 'SI_SDR', 'SI_SNR', 'SNR', 'NB_PESQ', 'WB_PESQ', 'ST
 def get_metric_list_on_device(device: Optional[str]):
     metric_device = {
         None: ['SDR', 'SI_SDR', 'SNR', 'SI_SNR', 'NB_PESQ', 'WB_PESQ', 'STOI', 'ESTOI', 'DNSMOS', 'pDNSMOS'],
-        "cpu": ['NB_PESQ', 'WB_PESQ', 'STOI', 'ESTOI'],
-        "gpu": ['SDR', 'SI_SDR', 'SNR', 'SI_SNR', 'DNSMOS', 'pDNSMOS'],
+        "cpu": ['NB_PESQ', 'WB_PESQ', 'STOI', 'ESTOI', 'DNSMOS', 'pDNSMOS'],
+        "gpu": ['SDR', 'SI_SDR', 'SNR', 'SI_SNR'],
     }
     return metric_device[device]
 
@@ -140,6 +140,7 @@ def cal_metrics_functional(
             imp_metrics[mname + '_i'] = metrics[mname] - input_metrics['input_' + mname]  # _i means improvement
             imp_metrics[mname + '_all' + '_i'] = (m_val - im_val).tolist()
         except Exception as e:
+            print(e)
             metrics[mname] = None
             metrics[mname + '_all'] = None
             if 'input_' + mname not in input_metrics.keys():
