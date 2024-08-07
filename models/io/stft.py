@@ -25,13 +25,14 @@ class STFT(nn.Module):
         self.n_fft, self.n_hop, self.win_len = n_fft, n_hop, win_len if win_len is not None else n_fft
         self.repr = str((n_fft, n_hop, win, win_len))
 
-        assert win in ['hann_window', 'sqrt_hann_window'], win
+        assert win in ['hann_window', 'sqrt_hann_window','hamming_window'], win
         if win == 'hann_window':
             window = torch.hann_window(self.n_fft)
-        else:
+        elif win == 'sqrt_hann_window':
             # For FT-JNF. Deep Non-linear Filters for Multi-channel Speech Enhancement and Separation
-            assert win == 'sqrt_hann_window', win
             window = torch.sqrt(torch.hann_window(self.n_fft))
+        elif win == 'hamming_window':
+            window = torch.hamming_window(self.n_fft)
         self.register_buffer('window', window)
 
     def forward(self, X: Tensor, original_len: int = None, inverse=False) -> Any:
