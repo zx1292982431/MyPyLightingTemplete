@@ -88,7 +88,7 @@ class TrainModule(pl.LightningModule):
 
         self.val_cpu_metric_input = []
         self.norm_if_exceed_1 = True
-        self.name = type(arch).__name__
+        self.name = type(arch).__name__ + '_' + exp_name if (exp_name!='exp' or exp_name!='notag') else type(arch).__name__
         self.reset = reset
 
         # save other parameters to `self`
