@@ -42,7 +42,7 @@ class TrainModule(pl.LightningModule):
         ref_channel: int,
         stft: STFT = STFT(n_fft=256, n_hop=128, win_len=256),
         norm: Norm = Norm(mode='none'),
-        loss: Loss = Loss(loss_func=neg_si_sdr, pit=False),
+        loss: nn.Module = Loss(loss_func=neg_si_sdr, pit=False),
         optimizer: Tuple[str, Dict[str, Any]] = ("Adam", {
             "lr": 0.001
         }),
@@ -174,6 +174,8 @@ class TrainModule(pl.LightningModule):
         self.log('val/' + self.loss.name, loss, sync_dist=True, batch_size=ys.shape[0])
         val_metric = {'loss': -loss, 'si_sdr': si_sdr_val, 'sdr': sdr_val}[self.val_metric]
         self.log('val/metric', val_metric, sync_dist=True, batch_size=ys.shape[0])  # log val/metric for checkpoint picking
+        # for log audio
+        self._mix, self._preds, self._target = x[0, self.channels.index(self.ref_channel)], yr_hat[0], yr[0]
 
         # always computes the sdr/sisdr for the comparison of different runs
         self.log('val/sdr', sdr_val, sync_dist=True, batch_size=ys.shape[0])

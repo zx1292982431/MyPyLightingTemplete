@@ -47,6 +47,13 @@ def on_validation_epoch_end(self: pl.LightningModule, cpu_metric_input: List[Tup
 
     cpu_metric_input.clear()
 
+     # log audio    
+    tensorboard = self.logger.experiment
+    tensorboard.add_audio(f"{self.current_epoch}/mix", self._mix.cpu().numpy().reshape(-1, 1), sample_rate= self.sample_rate, global_step = self.global_step)
+    for i in range(self._preds.shape[-2]):
+        tensorboard.add_audio(f"{self.current_epoch}/pred{i+1}", (self._preds[i]/torch.abs(self._preds[i]).max()).cpu().numpy().reshape(-1, 1), sample_rate= self.sample_rate, global_step = self.global_step)
+        tensorboard.add_audio(f"{self.current_epoch}/target{i+1}", (self._target[i]/torch.abs(self._target[i]).max()).cpu().numpy().reshape(-1, 1), sample_rate= self.sample_rate, global_step = self.global_step)
+
 
 def on_test_epoch_end(self: pl.LightningModule, results: List[Dict[str, Any]], cpu_metric_input: List, exp_save_path: str):
     """ calculate cpu metrics on CPU, collect results, save results to file
