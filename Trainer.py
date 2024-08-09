@@ -56,6 +56,7 @@ class TrainModule(pl.LightningModule):
         mchunk: Optional[Tuple[float, float]] = None,  # chunk for cal_metrics_functional
         val_metric: str = 'loss',
         write_examples: int = 200,
+        sample_rate: int =16000,
         ensemble: Union[int, str, List[str], Literal[None]] = None,
         compile: bool = False,
         exp_name: str = "exp",
@@ -85,6 +86,7 @@ class TrainModule(pl.LightningModule):
         self.norm = norm
         self.loss = loss
         self.compile_model = compile
+        self.sample_rate = sample_rate
 
         self.val_cpu_metric_input = []
         self.norm_if_exceed_1 = True

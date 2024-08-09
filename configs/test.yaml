@@ -94,6 +94,7 @@ model:
   mchunk: null
   val_metric: loss
   write_examples: 200
+  sample_rate: 16000
   ensemble: null
   compile: false
   exp_name: exp
