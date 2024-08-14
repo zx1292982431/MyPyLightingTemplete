@@ -182,10 +182,10 @@ def on_load_checkpoint(
         ensemble_opts: opts for ensemble. Defaults to None.
         compile: whether the checkpoint is a compiled one. Defaults to True.
     """
-    from pytorch_lightning.strategies import FSDPStrategy
-    if isinstance(self.trainer.strategy, FSDPStrategy):
-        rank_zero_warn('using fsdp, ensemble is disenabled')
-        return super(pl.LightningModule, self).on_load_checkpoint(checkpoint)
+    # from pytorch_lightning.strategies import FSDPStrategy
+    # if isinstance(self.trainer.strategy, FSDPStrategy):
+    #     rank_zero_warn('using fsdp, ensemble is disenabled')
+    #     return super(pl.LightningModule, self).on_load_checkpoint(checkpoint)
 
     if ensemble_opts:
         ckpt = self.trainer.ckpt_path

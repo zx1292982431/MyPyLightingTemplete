@@ -2,7 +2,7 @@
 seed_everything: true
 trainer:
   accelerator: auto
-  strategy: auto
+  strategy: ddp
   devices: auto
   num_nodes: 1
   precision: null

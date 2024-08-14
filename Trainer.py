@@ -73,6 +73,8 @@ class TrainModule(pl.LightningModule):
         super().__init__()
 
         args = locals().copy()  # capture the parameters passed to this function or their edited values
+        
+        self.save_hyperparameters() # save the hy-params for load ckpt easyly, if model is huge, add ignore
 
         if compile != False:
             assert Version(torch.__version__) >= Version('2.0.0'), torch.__version__
