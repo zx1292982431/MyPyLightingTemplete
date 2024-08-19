@@ -102,6 +102,84 @@ class STFT(nn.Module):
 
     def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict, missing_keys, unexpected_keys, error_msgs):
         return
+    
+    def stftBCTF(self,x):
+        """stft
+        Args:
+            x: [..., time]
+
+        Returns:
+            the Real STFT domain with shape [B,2C,T,F]
+        """
+        shape = list(x.shape)
+        x = x.reshape(-1, shape[-1])
+        if x.is_cuda:
+            with torch.autocast(device_type=x.device.type, dtype=torch.float32):  # use float32 for stft & istft
+                X = torch.stft(x, n_fft=self.n_fft, hop_length=self.n_hop, win_length=self.win_len, window=self.window, return_complex=True)
+        else:
+            X = torch.stft(x, n_fft=self.n_fft, hop_length=self.n_hop, win_length=self.win_len, window=self.window, return_complex=True)
+        F, T = X.shape[-2:]
+        X = X.reshape(shape=shape[:-1] + [F, T])
+        B, C, F, T = X.shape
+        X = X.permute(0, 2, 3, 1)  # B,F,T,C; complex
+        X = torch.view_as_real(X).reshape(B, F, T, -1) # B,F,T,2C
+        X = X.permute(0,3,2,1) # B,2C,T,F
+        return X, shape[-1]
+    
+    def stftBFTH(self,x):
+        """stft
+        Args:
+            x: [..., time]
+
+        Returns:
+            the Real STFT domain with shape [B,F,T,2C]
+        """
+        shape = list(x.shape)
+        x = x.reshape(-1, shape[-1])
+        if x.is_cuda:
+            with torch.autocast(device_type=x.device.type, dtype=torch.float32):  # use float32 for stft & istft
+                X = torch.stft(x, n_fft=self.n_fft, hop_length=self.n_hop, win_length=self.win_len, window=self.window, return_complex=True)
+        else:
+            X = torch.stft(x, n_fft=self.n_fft, hop_length=self.n_hop, win_length=self.win_len, window=self.window, return_complex=True)
+        F, T = X.shape[-2:]
+        X = X.reshape(shape=shape[:-1] + [F, T])
+        B, C, F, T = X.shape
+        X = X.permute(0, 2, 3, 1)  # B,F,T,C; complex
+        X = torch.view_as_real(X).reshape(B, F, T, -1) # B,F,T,2C
+        return X, shape[-1]
+    
+    def istftBCTF(self, X: Tensor, original_len: int = None) -> Tensor:
+        """istft
+        X: B,2C,T,F
+        original_len: returned by stft, int
+        -------------------------------------
+        returns:
+            x: B,C,nsamples
+        """
+        X = X.permute(0,3,2,1)
+        B,F,T,H = X.shape
+        if not torch.is_complex(X):
+            X = torch.view_as_complex(X.float().reshape(B, F, T, -1, 2))  # [B,F,T,Spk]
+        X = X.permute(0, 3, 1, 2)  # [B,Spk,F,T]
+        
+        y = self.istft(X,original_len)
+        return y
+    
+    def istftBFTH(self, X: Tensor, original_len: int = None) -> Tensor:
+        """istft
+        X: B,F,T,2C
+        original_len: returned by stft, int
+        -------------------------------------
+        returns:
+            x: B,C,nsamples
+        """
+        B,F,T,H = X.shape
+        if not torch.is_complex(X):
+            X = torch.view_as_complex(X.float().reshape(B, F, T, -1, 2))  # [B,F,T,Spk]
+        X = X.permute(0, 3, 1, 2)  # [B,Spk,F,T]
+        
+        y = self.istft(X,original_len)
+        return y
 
 
 if __name__ == '__main__':
