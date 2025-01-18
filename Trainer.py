@@ -28,7 +28,6 @@ from models.utils.my_save_config_callback import MySaveConfigCallback as SaveCon
 from models.utils.my_earlystopping import MyEarlyStopping as EarlyStopping
 import dataloaders
 
-
 class TrainModule(pl.LightningModule):
     """Network Lightning Module, which controls the training, testing, and inference of given arch and io
     """
@@ -175,7 +174,7 @@ class TrainModule(pl.LightningModule):
             autocast.__exit__(None, None, None)
 
         # logging
-        self.log('val/' + self.loss.name, loss, sync_dist=True, batch_size=ys.shape[0])
+        self.log('val/loss', loss, sync_dist=True, batch_size=ys.shape[0])
         val_metric = {'loss': -loss, 'si_sdr': si_sdr_val, 'sdr': sdr_val}[self.val_metric]
         self.log('val/metric', val_metric, sync_dist=True, batch_size=ys.shape[0])  # log val/metric for checkpoint picking
         # for log audio
@@ -376,6 +375,18 @@ class TrainCLI(BaseCLI):
             "model_checkpoint.save_last": True
         }
         parser.set_defaults(model_checkpoint_defaults)
+
+        parser.add_lightning_class_args(ModelCheckpoint, "last_checkpoint")
+        last_checkpoint_defults = {
+            "last_checkpoint.filename": "last",
+            "last_checkpoint.monitor": "epoch",
+            "last_checkpoint.mode": "max",
+            "last_checkpoint.every_n_epochs": 1,
+            "last_checkpoint.save_top_k": 1,  # save all checkpoints
+            "last_checkpoint.save_last": False
+        }
+        parser.set_defaults(last_checkpoint_defults)
+
 
         self.add_model_invariant_arguments_to_parser(parser)
 

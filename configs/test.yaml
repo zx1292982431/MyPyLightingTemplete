@@ -101,7 +101,7 @@ model:
   reset: null
 early_stopping:
   enable: false
-  monitor: val/metric
+  monitor: val/loss
   min_delta: 0.1
   patience: 10
   verbose: false
@@ -115,13 +115,28 @@ early_stopping:
 model_checkpoint:
   dirpath: null
   filename: epoch{epoch}_metric{val/metric:.4f}
-  monitor: val/metric
+  monitor: val/loss
   verbose: false
-  save_last: true
-  save_top_k: -1
+  save_last: false
+  save_top_k: 3
   save_weights_only: false
   mode: max
   auto_insert_metric_name: false
+  every_n_train_steps: null
+  train_time_interval: null
+  every_n_epochs: 1
+  save_on_train_epoch_end: null
+  enable_version_counter: true
+last_checkpoint:
+  dirpath: null
+  filename: last
+  monitor: epoch
+  verbose: false
+  save_last: false
+  save_top_k: 1
+  save_weights_only: false
+  mode: max
+  auto_insert_metric_name: true
   every_n_train_steps: null
   train_time_interval: null
   every_n_epochs: 1
