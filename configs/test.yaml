@@ -147,9 +147,9 @@ progress_bar:
   leave: false
   theme:
     description: white
-    progress_bar: '#6206E0'
-    progress_bar_finished: '#6206E0'
-    progress_bar_pulse: '#6206E0'
+    progress_bar: green
+    progress_bar_finished: green
+    progress_bar_pulse: green
     batch_progress: white
     time: grey54
     processing_speed: grey70
