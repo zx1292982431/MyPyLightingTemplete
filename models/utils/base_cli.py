@@ -42,7 +42,18 @@ class BaseCLI(LightningCLI):
             "no_color": True,
             "width": 200,
         }})
-
+        parser.set_defaults({"progress_bar.theme": {
+            "description": "white",
+            "progress_bar": "green",
+            "progress_bar_finished": "green",
+            "progress_bar_pulse": "green",
+            "batch_progress": "white",
+            "time": "grey54",
+            "processing_speed": "grey70",
+            "metrics": "white",
+            "metrics_text_delimiter": ' ',
+            "metrics_format": ".3f",
+        }})
         # LearningRateMonitor
         parser.add_lightning_class_args(LearningRateMonitor, "learning_rate_monitor")
         learning_rate_monitor_defaults = {
